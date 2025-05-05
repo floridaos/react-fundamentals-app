@@ -1,7 +1,7 @@
 export const mockedCoursesList = [
   {
     id: "de5aaa59-90f5-4dbc-b8a9-aaf205c551ba",
-    title: "JavaScript",
+    title: "TITLE 1",
     description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum 
                     has been the industry's standard dummy text ever since the 1500s, when an unknown 
                     printer took a galley of type and scrambled it to make a type specimen book. It has survived 
@@ -16,10 +16,8 @@ export const mockedCoursesList = [
   },
   {
     id: "b5630fdd-7bf7-4d39-b75a-2b5906fd0916",
-    title: "Angular",
-    description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum 
-                    has been the industry's standard dummy text ever since the 1500s, when an unknown 
-                    printer took a galley of type and scrambled it to make a type specimen book.`,
+    title: "TITLE 2",
+    description: `TESTTESTEASTTESTTESTEASTTESTTESTEASTTESTTESTEASTTESTTESTEASTTESTTESTEAST`,
     creationDate: "10/11/2020",
     duration: 210,
     authors: [
