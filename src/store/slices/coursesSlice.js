@@ -1,20 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = [];
-
-export const coursesSlice = createSlice({
+const coursesSlice = createSlice({
   name: "courses",
-  initialState,
+  initialState: [],
   reducers: {
-    // setCourses:
-    // saveCourse:
-    // deleteCourse:
-    // updateCourse:
+    setCourses: (state, action) => action.payload,
+    addCourse: (state, action) => {
+      state.push(action.payload);
+    },
+    deleteCourse: (state, action) => {
+      return state.filter((course) => course.id !== action.payload);
+    },
   },
 });
 
-// use these actions in your components / thunks
-export const { setCourses, saveCourse, deleteCourse, updateCourse } =
-  coursesSlice.actions;
-
+export const { setCourses, addCourse, deleteCourse } = coursesSlice.actions;
 export default coursesSlice.reducer;

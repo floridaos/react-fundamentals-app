@@ -1,31 +1,22 @@
-// // Module 1. You don't need to do anything with this component (we had to comment this component for 1st module tests)
-
-// // Module 2.
-// // * uncomment this component (ctrl + a => ctrl + /)
-// // * finish markup according to the figma https://www.figma.com/design/m0N0SGLclqUEGR6TUNvyn9/Fundamentals-Courses?node-id=2927-216&t=OXbHXwMixWTtxRSw-1
-// // * add validation for fields: all fields are required. Show validation message. https://www.figma.com/design/m0N0SGLclqUEGR6TUNvyn9/Fundamentals-Courses?node-id=2932-191&t=OXbHXwMixWTtxRSw-1
-// // * render this component by route '/login'
-// // * use login service to submit form data and make POST API request '/login'.
-// // * component should have a link to the Registration page (see design)
-// // * save token from API after success login to localStorage.
-// // ** PAY ATTENTION ** token should be saved to localStorage inside login handler function after login service response
-// // ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-2/home-task/components#login-new-component
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./styles.module.css";
 import { Input } from "../../common/Input/Input";
 import { Button } from "../../common/Button/Button";
 import { login } from "../../services";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../store/slices/userSlice";
 
-export const Login = ({ setToken, setUserName }) => {
+export const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.email.trim()) newErrors.email = "email is required";
-    if (!formData.password.trim()) newErrors.password = "password is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.password.trim()) newErrors.password = "Password is required";
     return newErrors;
   };
 
@@ -42,10 +33,14 @@ export const Login = ({ setToken, setUserName }) => {
     try {
       const data = await login(formData);
 
-      localStorage.setItem("token", data.result);
-      localStorage.setItem("userName", data.user.name);
-      setToken(data.result);
-      setUserName(data.user.name);
+      dispatch(
+        loginUser({
+          name: data.user.name,
+          email: data.user.email,
+          token: data.result,
+        })
+      );
+
       navigate("/courses");
     } catch (err) {
       alert(err.message || "Something went wrong");
@@ -99,10 +94,3 @@ export const Login = ({ setToken, setUserName }) => {
     </div>
   );
 };
-
-// // Module 3.
-// // * use 'setUserData' from 'userSlice.js' to save user's name, token and email to the store after success login.
-// // ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-3/home-task/components#login-component
-
-// // Module 4.
-// // * use 'setUserData' from 'userSlice.js' to add user's data to store. (DO NOT use 'user/me' [GET] request)

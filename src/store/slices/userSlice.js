@@ -4,19 +4,30 @@ const initialState = {
   isAuth: false,
   name: "",
   email: "",
-  token: localStorage.getItem("token"),
+  token: localStorage.getItem("token") || "",
 };
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    // setUserData:
-    // removeUserData:
+    loginUser: (state, action) => {
+      const { name, email, token } = action.payload;
+      state.isAuth = true;
+      state.name = name;
+      state.email = email;
+      state.token = token;
+      localStorage.setItem("token", token);
+    },
+    logoutUser: (state) => {
+      state.isAuth = false;
+      state.name = "";
+      state.email = "";
+      state.token = "";
+      localStorage.removeItem("token");
+    },
   },
 });
 
-// use these actions in your components / thunks
-export const { setUserData, removeUserData } = userSlice.actions;
-
+export const { loginUser, logoutUser } = userSlice.actions;
 export default userSlice.reducer;

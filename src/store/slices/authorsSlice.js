@@ -1,17 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = [];
-
-export const authorsSlice = createSlice({
+const authorsSlice = createSlice({
   name: "authors",
-  initialState,
+  initialState: [],
   reducers: {
-    // setAuthors:
-    // saveAuthor:
+    setAuthors: (state, action) => action.payload,
+    addAuthor: (state, action) => {
+      state.push(action.payload);
+    },
   },
 });
 
-// use these actions in your components / thunks
-export const { setAuthors, saveAuthor } = authorsSlice.actions;
-
+export const { setAuthors, addAuthor } = authorsSlice.actions;
 export default authorsSlice.reducer;
