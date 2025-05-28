@@ -10,6 +10,113 @@
 // // * save token from API after success login to localStorage.
 // // ** PAY ATTENTION ** token should be saved to localStorage inside login handler function after login service response
 // // ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-2/home-task/components#login-new-component
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import styles from "./styles.module.css";
+import { Input } from "../../common/Input/Input";
+import { Button } from "../../common/Button/Button";
+import { login } from "../../services";
+import { setUserData } from "../../store/slices/userSlice";
+
+export const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.email.trim()) newErrors.email = "email is required";
+    if (!formData.password.trim()) newErrors.password = "password is required";
+    return newErrors;
+  };
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+
+    try {
+      const data = await login(formData);
+      console.log("Login response:", data);
+
+      const token = data.result.startsWith("Bearer ")
+        ? data.result.substring(7)
+        : data.result;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("userRole", data.user.role);
+
+      dispatch(
+        setUserData({
+          token: token,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+        })
+      );
+
+      navigate("/courses");
+    } catch (err) {
+      alert(err.message || "Something went wrong");
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <h1>Login</h1>
+      <div className={styles.formContainer}>
+        <form onSubmit={handleSubmit} data-testid="loginForm">
+          <Input
+            labelText="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            data-testid="emailInput"
+          />
+          {errors.email && (
+            <div className={styles.error} data-testid="emailError">
+              {errors.email}
+            </div>
+          )}
+
+          <Input
+            labelText="Password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter password"
+            data-testid="passwordInput"
+          />
+          {errors.password && (
+            <div className={styles.error} data-testid="passwordError">
+              {errors.password}
+            </div>
+          )}
+
+          <Button buttonText="Login" type="submit" data-testid="loginButton" />
+        </form>
+
+        <p>
+          <span>If you don't have an account you </span>
+          <Link to="/registration" data-testid="registrationLink">
+            Registration
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
 
 // // Module 3.
 // // * use 'setUserData' from 'userSlice.js' to save user's name, token and email to the store after success login.
@@ -17,27 +124,3 @@
 
 // // Module 4.
 // // * use 'setUserData' from 'userSlice.js' to add user's data to store. (DO NOT use 'user/me' [GET] request)
-
-// import React from "react";
-
-// import styles from "./styles.module.css";
-
-// export const Login = () => {
-//   // write your code here
-
-//   return (
-//     <div className={styles.container}>
-//       <h1>Login</h1>
-//       <div className={styles.formContainer}>
-//         <form onSubmit={handleSubmit}>
-//           // reuse Input component for email field // reuse Input component for
-//           password field // reuse Button component for 'Login' button
-//         </form>
-//         <p>
-//           If you don't have an account you may&nbsp; // use <Link /> component
-//           for navigation to Registration page
-//         </p>
-//       </div>
-//     </div>
-//   );
-// };

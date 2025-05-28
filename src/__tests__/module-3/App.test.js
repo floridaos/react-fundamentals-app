@@ -4,9 +4,9 @@ import { MemoryRouter } from "react-router-dom";
 import App from "../../App";
 import { Provider } from "react-redux";
 import configureMockStore from "redux-mock-store";
-import { deleteCourse } from "../../store/slices/coursesSlice";
+import thunk from "redux-thunk";
 
-const mockStore = configureMockStore();
+const mockStore = configureMockStore([thunk]);
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
@@ -56,6 +56,7 @@ const getStore = (token = "") =>
       token,
       name: "Den",
       isAuth: !!token,
+      role: "admin",
     },
   });
 
@@ -141,13 +142,11 @@ describe("App", () => {
     );
 
     const courseElements = screen.getAllByTestId("courseCard");
-
     expect(courseElements[0]).toBeInTheDocument();
   });
 
   test('should render CourseForm component with "CREATE COURSE" button with data-testid="createCourseButton" if route "/courses/add"', () => {
     const store = getStore("token");
-
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={["/courses/add"]}>
@@ -161,7 +160,6 @@ describe("App", () => {
 
   test('should render CourseInfo component with data-testid="courseInfo" when route "/courses/:courseId"', () => {
     const store = getStore("token");
-
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={["/courses/1"]}>
@@ -173,20 +171,29 @@ describe("App", () => {
     expect(screen.getByTestId("courseInfo")).toBeInTheDocument();
   });
 
-  test('should remove course on Delete button with data-testid="delete" click (deleteCourse action form coursesSlice should be called with course id)', async () => {
+  test('should remove course on Delete button with data-testid="deleteCourse" click (deleteCourse action form coursesSlice should be called with course id)', async () => {
     const store = getStore("token");
+    const confirmSpy = jest
+      .spyOn(window, "confirm")
+      .mockImplementation(() => true);
 
     render(
       <Provider store={store}>
-        <MemoryRouter initialEntries={["/courses"]}>
+        <MemoryRouter initialEntries={["/"]}>
           <App />
         </MemoryRouter>
       </Provider>
     );
 
-    fireEvent.click(screen.queryAllByTestId(/delete/i)[0]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    fireEvent.click(screen.queryAllByTestId("deleteCourse")[0]);
 
     const actions = store.getActions();
-    expect(actions).toContainEqual(deleteCourse("1"));
+    expect(actions).toContainEqual({
+      type: "courses/deleteCourse",
+      payload: "1",
+    });
+
+    confirmSpy.mockRestore();
   });
 });

@@ -22,6 +22,7 @@
 	white-space: nowrap;
 	overflow: hidden;
 }
+
 .cardDetails > p > b {
 	padding-right: 5px;
 }
@@ -29,4 +30,16 @@
 .buttonsContainer {
 	display: flex;
 	gap: 10px;
+	align-items: center;
+}
+
+.noUnderline {
+	text-decoration: none;
+}
+
+.buttonsContainer img {
+	display: block;
+	width: 20px;
+	height: 20px;
+	object-fit: contain;
 }

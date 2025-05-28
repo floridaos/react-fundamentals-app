@@ -1,5 +1,4 @@
 import React from "react";
-
 import styles from "./styles.module.css";
 
 // Module 1:
@@ -10,11 +9,13 @@ export const Button = ({
   buttonText,
   handleClick,
   "data-testid": dataTestId,
+  type = "button",
 }) => (
   <button
     className={styles.button}
     onClick={handleClick}
     data-testid={dataTestId}
+    type={type}
   >
     {buttonText}
   </button>

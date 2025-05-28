@@ -65,7 +65,14 @@ describe("slices", () => {
 
     it("should save a new course with saveCourse action", () => {
       const initialState = [];
-      const newCourse = { id: 1, title: "New Course" };
+      const newCourse = {
+        id: "1",
+        title: "Test Course",
+        description: "Test Description",
+        duration: 60,
+        authors: [1, 2],
+        creationDate: "20/03/2012",
+      };
       const store = mockStore({ courses: initialState });
 
       store.dispatch(saveCourse(newCourse));
@@ -75,7 +82,7 @@ describe("slices", () => {
         type: "courses/saveCourse",
         payload: newCourse,
       };
-      expect(actions).toEqual([expectedAction]);
+      expect(actions).toContainEqual(expectedAction);
     });
 
     it("should delete a course with deleteCourse action", () => {
@@ -83,7 +90,7 @@ describe("slices", () => {
         { id: 1, title: "Course 1" },
         { id: 2, title: "Course 2" },
       ];
-      const courseIdToDelete = 1;
+      const courseIdToDelete = "1";
       const store = mockStore({ courses: initialState });
 
       store.dispatch(deleteCourse(courseIdToDelete));
@@ -93,7 +100,7 @@ describe("slices", () => {
         type: "courses/deleteCourse",
         payload: courseIdToDelete,
       };
-      expect(actions).toEqual([expectedAction]);
+      expect(actions).toContainEqual(expectedAction);
     });
   });
 

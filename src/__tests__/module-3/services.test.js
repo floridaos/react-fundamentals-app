@@ -1,25 +1,24 @@
-import { getAuthors, getCourses } from "../../services";
+import { getCourses, getAuthors } from "../../services";
 
 describe("services", () => {
   describe("getCourses", () => {
+    const mockCourses = [
+      { id: 1, title: "Course 1" },
+      { id: 2, title: "Course 2" },
+    ];
+
     beforeEach(() => {
-      jest.resetModules();
-      jest.resetAllMocks();
+      global.fetch = jest.fn();
     });
 
     it('should return the courses when the response is successful (call fetch with path - "http://localhost:4000/courses/all" method - "GET", headers - "Content-Type": "application/json")', async () => {
-      const mockCourses = [
-        { id: 1, title: "Course 1" },
-        { id: 2, title: "Course 2" },
-      ];
-      const mockResponse = {
+      global.fetch.mockResolvedValueOnce({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockCourses),
-      };
-
-      global.fetch = jest.fn().mockResolvedValue(mockResponse);
+        json: async () => ({ successful: true, result: mockCourses }),
+      });
 
       const courses = await getCourses();
+      expect(courses).toEqual(mockCourses);
 
       expect(fetch).toHaveBeenCalledWith("http://localhost:4000/courses/all", {
         method: "GET",
@@ -27,39 +26,37 @@ describe("services", () => {
           "Content-Type": "application/json",
         },
       });
-      expect(courses).toEqual(mockCourses);
     });
 
     it("should throw an error when the response is not successful (response.ok = false)", async () => {
-      const mockResponse = {
+      global.fetch.mockResolvedValueOnce({
         ok: false,
-      };
+        status: 400,
+        statusText: "Bad Request",
+      });
 
-      global.fetch = jest.fn().mockResolvedValue(mockResponse);
-
-      await expect(getCourses()).rejects.toThrow();
+      await expect(getCourses()).rejects.toThrow("Failed to fetch courses");
     });
   });
 
   describe("getAuthors", () => {
+    const mockAuthors = [
+      { id: 1, name: "Author 1" },
+      { id: 2, name: "Author 2" },
+    ];
+
     beforeEach(() => {
-      jest.resetModules();
-      jest.resetAllMocks();
+      global.fetch = jest.fn();
     });
 
     it('should return the authors when the response is successful (call fetch with path - "http://localhost:4000/authors/all" method - "GET", headers - "Content-Type": "application/json")', async () => {
-      const mockAuthors = [
-        { id: 1, name: "Author 1" },
-        { id: 2, name: "Author 2" },
-      ];
-      const mockResponse = {
+      global.fetch.mockResolvedValueOnce({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockAuthors),
-      };
-
-      global.fetch = jest.fn().mockResolvedValue(mockResponse);
+        json: async () => ({ successful: true, result: mockAuthors }),
+      });
 
       const authors = await getAuthors();
+      expect(authors).toEqual(mockAuthors);
 
       expect(fetch).toHaveBeenCalledWith("http://localhost:4000/authors/all", {
         method: "GET",
@@ -67,17 +64,16 @@ describe("services", () => {
           "Content-Type": "application/json",
         },
       });
-      expect(authors).toEqual(mockAuthors);
     });
 
     it("should throw an error when the response is not successful (response.ok = false)", async () => {
-      const mockResponse = {
+      global.fetch.mockResolvedValueOnce({
         ok: false,
-      };
+        status: 400,
+        statusText: "Bad Request",
+      });
 
-      global.fetch = jest.fn().mockResolvedValue(mockResponse);
-
-      await expect(getAuthors()).rejects.toThrow();
+      await expect(getAuthors()).rejects.toThrow("Failed to fetch authors");
     });
   });
 });

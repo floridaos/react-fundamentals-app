@@ -1,36 +1,50 @@
 import React from "react";
-import { render, fireEvent, screen } from "@testing-library/react";
-import configureMockStore from "redux-mock-store";
 import { Provider } from "react-redux";
-import { CreateAuthor } from "../../components/CourseForm/components/CreateAuthor";
-import { saveAuthor } from "../../store/slices/authorsSlice";
+import { render, screen, fireEvent } from "@testing-library/react";
+import configureMockStore from "redux-mock-store";
+import { CreateAuthor } from "../../components/CourseForm/components/CreateAuthor/CreateAuthor";
+import { createAuthorThunk } from "../../store/thunks/authorsThunk";
+
+// Mock the thunk
+jest.mock("../../store/thunks/authorsThunk", () => ({
+  createAuthorThunk: jest.fn((author) => ({
+    type: "authors/saveAuthor",
+    payload: { ...author, id: "test-id" },
+  })),
+}));
 
 const mockStore = configureMockStore();
-const store = mockStore({});
 
 describe("CreateAuthor component", () => {
-  it('should add a new author to the store when "CREATE AUTHOR" button is clicked (saveAuthor action from authorsSlice should be called with payload {id,name})', () => {
-    const { container } = render(
+  const store = mockStore({
+    authors: [],
+  });
+
+  beforeEach(() => {
+    store.clearActions();
+    // Mock window.alert
+    jest.spyOn(window, "alert").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("should create a new author on CREATE AUTHOR button click", () => {
+    render(
       <Provider store={store}>
         <CreateAuthor />
       </Provider>
     );
 
-    const nameInput = container.querySelector("input");
-    fireEvent.change(nameInput, { target: { value: "John Doe" } });
+    const input = screen.getByPlaceholderText(/enter author name/i);
+    const button = screen.getByText(/create author/i);
 
-    // Click the "Create Author" button
-    const createButton = screen.queryByText(/create author/i);
-    fireEvent.click(createButton);
+    fireEvent.change(input, { target: { value: "Test Author" } });
+    fireEvent.click(button);
 
-    // Check if the saveAuthor was dispatched with the correct author object
-    const expectedAuthor = {
-      name: "John Doe",
-    };
-    const mockedAction = saveAuthor(expectedAuthor);
-    const actions = store.getActions();
-
-    expect(actions[0].type).toBe(mockedAction.type);
-    expect(actions[0].payload.name).toEqual(mockedAction.payload.name);
+    expect(createAuthorThunk).toHaveBeenCalledWith({
+      name: "Test Author",
+    });
   });
 });

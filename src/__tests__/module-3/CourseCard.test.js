@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import configureMockStore from "redux-mock-store";
-import { CourseCard } from "../../components/Courses/components/CourseCard";
+import { CourseCard } from "../../components/Courses/components/CourseCard/CourseCard";
 
 const mockStore = configureMockStore();
 const course = {
@@ -27,6 +27,7 @@ const store = mockStore({
     },
   ],
   courses: [course],
+  user: { role: "admin" },
 });
 
 describe("CourseCard component", () => {

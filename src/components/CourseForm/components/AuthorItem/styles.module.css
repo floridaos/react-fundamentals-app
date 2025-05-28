@@ -1,6 +1,19 @@
 .authorItem {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
-  align-items: flex-end;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.authorName {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }

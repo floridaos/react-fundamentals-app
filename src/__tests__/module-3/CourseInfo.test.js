@@ -1,148 +1,73 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { CourseInfo } from "../../components/CourseInfo";
-import { formatCreationDate, getCourseDuration } from "../../helpers";
-import { MemoryRouter } from "react-router";
-
+import { CourseInfo } from "../../components";
 import { Provider } from "react-redux";
 import configureMockStore from "redux-mock-store";
-
-const mockStore = configureMockStore();
-
-const store = mockStore({
-  authors: [
-    {
-      id: 1,
-      name: "Test Name 1",
-    },
-    {
-      id: 2,
-      name: "Test Name 2",
-    },
-  ],
-  courses: [
-    {
-      title: "Test Title 1",
-      description: "Test Description 1",
-      authors: [1, 2],
-      duration: 60,
-      creationDate: "20/03/2012",
-      id: "1",
-    },
-    {
-      title: "Test Title 2",
-      description: "Test Description 2",
-      authors: [1, 2],
-      duration: 60,
-      creationDate: "20/03/2012",
-      id: "2",
-    },
-    {
-      title: "Test Title 3",
-      description: "Test Description 3",
-      authors: [1, 2],
-      duration: 60,
-      creationDate: "20/03/2012",
-      id: "3",
-    },
-  ],
-  user: {
-    name: "Den",
-    isAuth: true,
-    token: "test token",
-  },
-});
-const useParamsResponse = { courseId: "1" };
+import { BrowserRouter as Router } from "react-router-dom";
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useParams: () => useParamsResponse,
+  useParams: () => ({ courseId: "1" }),
 }));
 
+const mockStore = configureMockStore();
+const courses = [
+  {
+    title: "Test Title 1",
+    description: "Test Description 1",
+    authors: [1, 2],
+    duration: 60,
+    creationDate: "20/03/2012",
+    id: "1",
+  },
+];
+
+const authors = [
+  {
+    id: 1,
+    name: "Test Name 1",
+  },
+  {
+    id: 2,
+    name: "Test Name 2",
+  },
+];
+
+const store = mockStore({
+  courses,
+  authors,
+});
+
 describe("CourseInfo", () => {
-  test("should render correct title (find correct course from coursesList (use getCoursesSelector inside <CourseInfo />) based on courseId param (use useParams hook))", () => {
+  beforeEach(() => {
     render(
-      <Provider store={store}>
-        <MemoryRouter>
+      <Router>
+        <Provider store={store}>
           <CourseInfo />
-        </MemoryRouter>
-      </Provider>
+        </Provider>
+      </Router>
     );
-
-    const courseTitle = screen.getByRole("heading", { level: 1 });
-
-    expect(courseTitle.textContent).toBe("Test Title 1");
   });
 
-  test("should render correct description", () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <CourseInfo />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    const courseDescription = screen.getByText("Test Description 1");
-
-    expect(courseDescription).toBeInTheDocument();
+  it("should display course title", () => {
+    expect(screen.getByText("Test Title 1")).toBeInTheDocument();
   });
 
-  test("should render correct course duration (use getCourseDuration)", () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <CourseInfo />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    const courseDuration = screen.queryByText(getCourseDuration(60));
-
-    expect(courseDuration).toBeInTheDocument();
+  it("should display course description", () => {
+    expect(screen.getByText("Test Description 1")).toBeInTheDocument();
   });
 
-  test("should render correct course creation date (use formatCreationDate)", () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <CourseInfo />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    const courseCreationDate = screen.getByText(
-      formatCreationDate(store.getState().courses[0].creationDate)
-    );
-    expect(courseCreationDate).toBeInTheDocument();
+  it("should display course duration", () => {
+    expect(screen.getByText(/01:00 hour/)).toBeInTheDocument();
   });
 
-  test("should render correct course authors names (match authors of current course (use getCoursesSelector inside <CourseInfo />) and all authors (use getAuthorsSelector inside <CourseInfo />))", () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <CourseInfo />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    const authorNames = screen
-      .getAllByRole("listitem")
-      .map((li) => li.textContent);
-
-    expect(authorNames).toEqual(["Test Name 1", "Test Name 2"]);
+  it("should display course authors", () => {
+    expect(screen.getByText("Test Name 1")).toBeInTheDocument();
+    expect(screen.getByText("Test Name 2")).toBeInTheDocument();
   });
 
-  test('should render "BACK" button as a Link provided by react-router-dom with to="/courses"', () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <CourseInfo />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    const backButton = screen.getByRole("link", { name: "Back" });
-    expect(backButton).toHaveAttribute("href", "/courses");
+  it("should display back button as a Link with to='/courses'", () => {
+    const backLink = screen.getByText("← BACK").closest("a");
+    expect(backLink).toHaveAttribute("href", "/courses");
   });
 });

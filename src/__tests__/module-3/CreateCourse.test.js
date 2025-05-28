@@ -4,7 +4,15 @@ import { BrowserRouter as Router } from "react-router-dom";
 import configureMockStore from "redux-mock-store";
 import { Provider } from "react-redux";
 import { CourseForm } from "../../components/CourseForm";
-import { saveCourse } from "../../store/slices/coursesSlice";
+import { createCourseThunk } from "../../store/thunks/coursesThunk";
+
+// Mock the thunk
+jest.mock("../../store/thunks/coursesThunk", () => ({
+  createCourseThunk: jest.fn((course) => ({
+    type: "courses/saveCourse",
+    payload: course,
+  })),
+}));
 
 const mockStore = configureMockStore();
 const store = mockStore({
@@ -21,6 +29,16 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe("CourseForm", () => {
+  beforeEach(() => {
+    store.clearActions();
+    // Mock window.alert
+    jest.spyOn(window, "alert").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('should add new course to the store on "CREATE COURSE" button with data-testid="createCourseButton" click (saveCourse action from coursesSlice should be called with payload {title,description,duration,authors}', () => {
     render(
       <Provider store={store}>
@@ -45,22 +63,11 @@ describe("CourseForm", () => {
 
     fireEvent.click(createCourseButton);
 
-    const course = {
+    expect(createCourseThunk).toHaveBeenCalledWith({
       title: "Course Title",
       description: "Course Description",
       duration: 20,
       authors: [1],
-    };
-
-    const mockedAction = saveCourse(course);
-    const actions = store.getActions();
-
-    expect(actions[0].type).toBe(mockedAction.type);
-    expect(actions[0].payload.title).toEqual(mockedAction.payload.title);
-    expect(actions[0].payload.description).toEqual(
-      mockedAction.payload.description
-    );
-    expect(actions[0].payload.duration).toEqual(mockedAction.payload.duration);
-    expect(actions[0].payload.authors).toEqual(mockedAction.payload.authors);
+    });
   });
 });

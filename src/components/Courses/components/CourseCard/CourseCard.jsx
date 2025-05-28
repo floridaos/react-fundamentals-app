@@ -13,6 +13,78 @@
 
 // Module 2.
 // * remove prop 'handleShowCourse' => use 'Link' from 'react-router-dom' instead
+import React from "react";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getCourseDuration, formatCreationDate } from "../../../../helpers";
+import styles from "./styles.module.css";
+import { Button } from "../../../../common";
+import deleteIcon from "../../../../assets/deleteButtonIcon.svg";
+import editIcon from "../../../../assets/editButtonIcon.svg";
+import { deleteCourseThunk } from "../../../../store/thunks/coursesThunk";
+
+export const CourseCard = ({ course }) => {
+  const dispatch = useDispatch();
+  const authorsList = useSelector((state) => state.authors);
+
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this course?")) {
+      dispatch(deleteCourseThunk(course.id));
+    }
+  };
+
+  return (
+    <div className={styles.cardContainer} data-testid="courseCard">
+      <div className={styles.cardText}>
+        <h2>{course.title}</h2>
+        <p>{course.description}</p>
+      </div>
+      <div className={styles.cardDetails}>
+        <p>
+          <b>Authors: </b>
+          {course.authors
+            .map((id) => {
+              const author = authorsList.find((a) => a.id === id);
+              return author ? author.name : "Unknown Author";
+            })
+            .join(", ")}
+        </p>
+        <p>
+          <b>Duration:</b> <span>{getCourseDuration(course.duration)}</span>
+        </p>
+        <p>
+          <b>Created: </b>
+          <span>{formatCreationDate(course.creationDate)}</span>
+        </p>
+        <div className={styles.buttonsContainer}>
+          <Link to={`/courses/${course.id}`} className={styles.noUnderline}>
+            <Button buttonText="SHOW COURSE" />
+          </Link>
+          <Button
+            buttonText={
+              <img src={editIcon} alt="Edit" width="20" height="20" />
+            }
+            handleClick={() => {
+              window.open(
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "_blank"
+              );
+            }}
+            data-testid="updateCourse"
+          />
+          <div data-testid="deleteCourse">
+            <Button
+              buttonText={
+                <img src={deleteIcon} alt="Delete" width="20" height="20" />
+              }
+              handleClick={handleDelete}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Module 3.
 // * add two new buttons: update and delete'. Use icons from 'src/assets/...'.
@@ -34,48 +106,3 @@
 //   ** CourseCard should display duration in the correct format.
 //   ** CourseCard should display authors list.
 //   ** CourseCard should display created date in the correct format.
-
-import React from "react";
-
-import { getCourseDuration, formatCreationDate } from "../../../../helpers";
-
-import deleteIcon from "../../../../assets/deleteButtonIcon.svg";
-import editIcon from "../../../../assets/editButtonIcon.svg";
-
-import styles from "./styles.module.css";
-
-export const CourseCard = ({ course, handleShowCourse, authorsList }) => {
-  // write your code here
-
-  return (
-    <div className={styles.cardContainer} data-testid="courseCard">
-      <div className={styles.cardText}>
-        <h2>Title</h2>
-        <p>Description</p>
-      </div>
-      <div className={styles.cardDetails}>
-        <p>
-          <b>Authors: </b>
-          authors list
-        </p>
-        <p>
-          <b>Duration:</b>
-          <span>duration</span>
-        </p>
-        <p>
-          <b>Created: </b>
-          <span>date</span>
-        </p>
-        <div className={styles.buttonsContainer}>
-          {/* 
-				reuse Button component for 'Show course' button 
-				reuse Button	component with deleteButtonIcon from 'src/assets' for 'Delete' button
-						with data-testid="deleteCourse" 
-				reuse Button component wrapped with Link from react-router with editButtonIcon from 'src/assets' for 'Update' button with
-						data-testid="updateCourse" 
-			*/}
-        </div>
-      </div>
-    </div>
-  );
-};
